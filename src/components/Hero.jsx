@@ -1,3 +1,5 @@
+import { FaWhatsapp } from 'react-icons/fa'
+
 export default function Hero() {
   return (
     <section
@@ -37,7 +39,8 @@ export default function Hero() {
           <a href="https://wa.me/14034985666?text=Hi%20Sam!" target="_blank" rel="noreferrer"
             className="flex items-center gap-2 px-8 py-4 rounded-full font-body text-sm tracking-widest uppercase font-semibold text-cake-ink"
             style={{ background: 'linear-gradient(135deg, #f0d080, #c9a84c, #a8852a)' }}>
-            💬 Order on WhatsApp
+            <FaWhatsapp size={18} color="#ffffff" className="shrink-0" aria-hidden />
+            Order on WhatsApp
           </a>
           <button onClick={() => document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' })}
             className="flex items-center gap-2 px-8 py-4 rounded-full font-body text-sm tracking-widest uppercase font-semibold text-white border border-white/40 hover:border-gold-400 transition-colors">

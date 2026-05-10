@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Heart, Cake, Baby, Sparkles, Building2, Cookie } from 'lucide-react'
+import { FaWhatsapp } from 'react-icons/fa'
 
 const SERVICES = [
   { icon: Cake, title: 'Wedding Cakes', desc: 'Bespoke multi-tier masterpieces crafted to match your theme, colour palette, and vision. Every petal, every tier — perfect.', detail: 'Consultation included' },
@@ -154,7 +155,8 @@ export default function Services() {
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-body text-sm tracking-widest uppercase font-semibold text-cake-ink relative z-10"
             style={{ background: 'linear-gradient(135deg, #f0d080, #c9a84c, #a8852a)' }}
           >
-            💬 Let's Chat on WhatsApp
+            <FaWhatsapp size={18} color="#ffffff" className="shrink-0" aria-hidden />
+            Let's Chat on WhatsApp
           </motion.a>
         </motion.div>
       </div>

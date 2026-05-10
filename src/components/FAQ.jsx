@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { FaWhatsapp } from 'react-icons/fa'
 
 const FAQS = [
   { q: 'How far in advance should I order?', a: 'We recommend 2–4 weeks for custom cakes, and at least 4–6 weeks for wedding cakes. Rush orders may be available depending on availability — send us a message to check.' },
@@ -104,7 +105,8 @@ export default function FAQ() {
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-body text-sm tracking-widest uppercase font-semibold text-cake-ink"
             style={{ background: 'linear-gradient(135deg, #f0d080, #c9a84c, #a8852a)' }}
           >
-            💬 Ask on WhatsApp
+            <FaWhatsapp size={18} color="#ffffff" className="shrink-0" aria-hidden />
+            Ask on WhatsApp
           </motion.a>
         </motion.div>
       </div>
