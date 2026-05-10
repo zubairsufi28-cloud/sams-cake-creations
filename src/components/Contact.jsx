@@ -176,6 +176,7 @@ Message: ${form.message}`
                   />
                 </div>
                 <div>
+                  {/* Cake size dropdown only — no “number of guests” text field */}
                   <label htmlFor="contact-cake-size" className="block font-body text-xs text-cake-muted tracking-widest uppercase mb-2">Cake Size</label>
                   <select
                     id="contact-cake-size"
