@@ -150,7 +150,7 @@ Message: ${form.message}`
               className="flex items-center justify-center gap-3 p-5 rounded-2xl font-body text-sm font-semibold tracking-widest uppercase text-white"
               style={{ background: '#25D366' }}
             >
-              <FaWhatsapp size={22} className="shrink-0 text-white" aria-hidden />
+              <FaWhatsapp size={18} color="#ffffff" className="shrink-0" aria-hidden />
               Order Directly on WhatsApp
             </motion.a>
 
