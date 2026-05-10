@@ -4,11 +4,17 @@ import { FaInstagram, FaFacebook, FaWhatsapp, FaTiktok } from 'react-icons/fa'
 const NAV_LINKS = ['Home', 'Gallery', 'Services', 'About', 'Testimonials', 'FAQ', 'Contact']
 
 const SOCIAL_LINKS = [
-  { href: 'https://www.instagram.com/samscakecreations_', icon: FaInstagram, label: 'Instagram' },
-  { href: 'https://wa.me/14034985666', icon: FaWhatsapp, label: 'WhatsApp' },
-  { href: 'https://www.facebook.com/profile.php?id=100094201780906', icon: FaFacebook, label: 'Facebook' },
-  { href: 'https://www.tiktok.com/@samscakecreations', icon: FaTiktok, label: 'TikTok' },
+  { href: 'https://www.instagram.com/samscakecreations_', icon: FaInstagram, label: 'Instagram', brand: 'instagram' },
+  { href: 'https://wa.me/14034985666', icon: FaWhatsapp, label: 'WhatsApp', brand: 'whatsapp' },
+  { href: 'https://www.facebook.com/profile.php?id=100094201780906', icon: FaFacebook, label: 'Facebook', brand: 'facebook' },
+  { href: 'https://www.tiktok.com/@samscakecreations', icon: FaTiktok, label: 'TikTok', brand: 'tiktok' },
 ]
+
+const BRAND_ICON_COLOR = {
+  whatsapp: '#25D366',
+  facebook: '#1877F2',
+  tiktok: '#000000',
+}
 
 const scrollTo = (section) => {
   document.getElementById(section.toLowerCase())?.scrollIntoView({ behavior: 'smooth' })
@@ -20,6 +26,17 @@ export default function Footer() {
       {/* Gold top line */}
       <div className="absolute top-0 left-0 right-0 h-px"
         style={{ background: 'linear-gradient(90deg, transparent, #f5c0d5, transparent)' }} />
+
+      <svg className="pointer-events-none absolute h-0 w-0 overflow-hidden" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="footer-insta-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#833ab4" />
+            <stop offset="35%" stopColor="#d6249f" />
+            <stop offset="65%" stopColor="#fd5949" />
+            <stop offset="100%" stopColor="#fcb045" />
+          </linearGradient>
+        </defs>
+      </svg>
 
       <div className="max-w-7xl mx-auto px-6 pt-16 pb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
@@ -40,19 +57,22 @@ export default function Footer() {
             <div className="flex gap-3">
               {SOCIAL_LINKS.map((s) => {
                 const Icon = s.icon
+                const iconProps =
+                  s.brand === 'instagram'
+                    ? { size: 22, style: { fill: 'url(#footer-insta-grad)' } }
+                    : { size: 22, color: BRAND_ICON_COLOR[s.brand] }
                 return (
                   <motion.a
                     key={s.label}
                     href={s.href}
                     target="_blank"
                     rel="noreferrer"
-                    whileHover={{ scale: 1.1 }}
-                    className="w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-cake-card"
-                    style={{ border: '1px solid #f5c0d5' }}
+                    whileHover={{ scale: 1.08 }}
+                    className="flex h-11 w-11 items-center justify-center rounded-full border border-cake-line/90 bg-white shadow-sm transition-shadow hover:shadow-md"
                     title={s.label}
                     aria-label={s.label}
                   >
-                    <Icon size={18} color="#c9a84c" />
+                    <Icon aria-hidden {...iconProps} />
                   </motion.a>
                 )
               })}
