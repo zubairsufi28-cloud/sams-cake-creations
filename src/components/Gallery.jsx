@@ -74,7 +74,7 @@ function CakeCard({ cake, index }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+              className="pointer-events-none w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
             />
           </AnimatePresence>
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
@@ -89,19 +89,24 @@ function CakeCard({ cake, index }) {
                 type="button"
                 onClick={goPrev}
                 aria-label="Previous photo"
-                className="absolute left-2 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/35 text-white opacity-0 backdrop-blur-sm transition-opacity duration-300 hover:bg-black/50 group-hover:opacity-100"
+                className="absolute left-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gold-600/50 text-cake-ink shadow-md transition-transform hover:scale-105 active:scale-95"
+                style={{ background: 'linear-gradient(135deg, #f0d080, #c9a84c, #a8852a)' }}
               >
-                <ChevronLeft className="h-5 w-5" strokeWidth={2.25} />
+                <ChevronLeft className="h-5 w-5 shrink-0" strokeWidth={2.5} aria-hidden />
               </button>
               <button
                 type="button"
                 onClick={goNext}
                 aria-label="Next photo"
-                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/35 text-white opacity-0 backdrop-blur-sm transition-opacity duration-300 hover:bg-black/50 group-hover:opacity-100"
+                className="absolute right-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gold-600/50 text-cake-ink shadow-md transition-transform hover:scale-105 active:scale-95"
+                style={{ background: 'linear-gradient(135deg, #f0d080, #c9a84c, #a8852a)' }}
               >
-                <ChevronRight className="h-5 w-5" strokeWidth={2.25} />
+                <ChevronRight className="h-5 w-5 shrink-0" strokeWidth={2.5} aria-hidden />
               </button>
-              <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+              <div
+                className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 gap-2 rounded-full px-2 py-1"
+                style={{ background: 'rgba(42, 10, 24, 0.35)' }}
+              >
                 {photos.map((_, i) => (
                   <button
                     key={i}
@@ -112,10 +117,11 @@ function CakeCard({ cake, index }) {
                       e.stopPropagation()
                       setPhotoIndex(i)
                     }}
-                    className="h-1.5 rounded-full transition-all duration-300"
+                    className="h-2 rounded-full transition-all duration-300"
                     style={{
-                      width: i === photoIndex ? '1.25rem' : '0.375rem',
-                      background: i === photoIndex ? 'rgba(240,208,128,0.95)' : 'rgba(255,255,255,0.45)',
+                      width: i === photoIndex ? '1.35rem' : '0.45rem',
+                      background: i === photoIndex ? '#f0d080' : 'rgba(255,255,255,0.55)',
+                      boxShadow: i === photoIndex ? '0 0 0 1px rgba(168, 133, 42, 0.8)' : 'none',
                     }}
                   />
                 ))}
