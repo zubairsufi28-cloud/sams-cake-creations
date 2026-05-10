@@ -11,6 +11,7 @@ import Contact from './components/Contact'
 import Footer from './components/Footer'
 import WhatsAppFloat from './components/WhatsAppFloat'
 
+// Bump commit to trigger Vercel redeploy (e.g. after env var updates).
 const Admin = lazy(() => import('./pages/Admin'))
 
 function PublicSite() {
