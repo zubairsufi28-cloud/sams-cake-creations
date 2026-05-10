@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gold: #c9a84c;
+  --gold-light: #e0b84a;
+  --gold-dark: #a8852a;
+  --cake-bg: #fff0f5;
+  --cake-section: #ffe4ef;
+  --cake-card: #ffffff;
+  --cake-ink: #2a0a18;
+  --cake-muted: #6b3050;
+  --cake-line: #f5c0d5;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--cake-bg);
+  color: var(--cake-muted);
+  font-family: 'Jost', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--cake-section); }
+::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 3px; }
+
+/* Gold gradient text */
+.gold-text {
+  background: linear-gradient(135deg, #f0d080 0%, #c9a84c 40%, #a8852a 70%, #e0b84a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Section padding */
+.section-pad {
+  padding: 100px 5%;
+}
+
+@media (max-width: 768px) {
+  .section-pad {
+    padding: 70px 5%;
+  }
+}
+
+/* Grain overlay — soft pink bakery */
+.grain::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-color: rgba(255, 182, 193, 0.06);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  background-blend-mode: soft-light;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.35;
+}
+
+/* 3D card tilt */
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.4s ease;
+}
+
+/* Gold shimmer animation */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.gold-shimmer {
+  background: linear-gradient(90deg, #a8852a 0%, #f0d080 25%, #c9a84c 50%, #f0d080 75%, #a8852a 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Float animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-12px) rotate(1deg); }
+  66% { transform: translateY(-6px) rotate(-1deg); }
+}
+
+.float { animation: float 6s ease-in-out infinite; }
+.float-delay-1 { animation: float 6s ease-in-out 1s infinite; }
+.float-delay-2 { animation: float 6s ease-in-out 2s infinite; }
+.float-delay-3 { animation: float 6s ease-in-out 3s infinite; }
+
+/* Glow */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(201, 168, 76, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(201, 168, 76, 0.6); }
+}
+
+.gold-glow { animation: glow-pulse 3s ease-in-out infinite; }
+
+/* Fade in up */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-up { animation: fadeInUp 0.8s ease forwards; }
+.fade-in-up-1 { animation: fadeInUp 0.8s ease 0.1s forwards; opacity: 0; }
+.fade-in-up-2 { animation: fadeInUp 0.8s ease 0.2s forwards; opacity: 0; }
+.fade-in-up-3 { animation: fadeInUp 0.8s ease 0.3s forwards; opacity: 0; }
+.fade-in-up-4 { animation: fadeInUp 0.8s ease 0.4s forwards; opacity: 0; }
+
+/* Particle */
+@keyframes particle-float {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+}
+
+/* Accent borders (gold remains for subtle gold rims where needed) */
+.border-gold { border-color: rgba(201, 168, 76, 0.35); }
+.border-gold-bright { border-color: rgba(201, 168, 76, 0.8); }
+
+/* Glass card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid #f5c0d5;
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: #f5c0d5;
+}
+
+/* Hero: 100dvh fills iPhone Safari dynamic viewport; no max-height (avoids clip + gap quirks) */
+#home {
+  box-sizing: border-box !important;
+  min-height: 100dvh !important;
+  height: 100dvh !important;
+  margin-bottom: -1px !important;
+  padding-bottom: 0 !important;
+  overflow: hidden !important;
+}
+
+#home video {
+  min-height: 100dvh !important;
+  height: 100% !important;
+  width: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Flush gallery to hero — kill any top gap from .section-pad shorthand */
+#home + * {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+#gallery.section-pad {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  padding-left: 5% !important;
+  padding-right: 5% !important;
+  padding-bottom: 70px !important;
+}
+
+@media (min-width: 769px) {
+  #gallery.section-pad {
+    padding-bottom: 100px !important;
+  }
+}
+
+main { margin: 0 !important; padding: 0 !important; }
+section { margin: 0 !important; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
