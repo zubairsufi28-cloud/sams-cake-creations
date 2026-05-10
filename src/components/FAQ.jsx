@@ -101,9 +101,9 @@ export default function FAQ() {
             target="_blank"
             rel="noreferrer"
             whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-body text-sm tracking-widest uppercase font-semibold text-cake-ink"
-            style={{ background: 'linear-gradient(135deg, #f0d080, #c9a84c, #a8852a)' }}
+            whileTap={{ scale: 0.97 }}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-body text-xs tracking-widest uppercase font-semibold text-white transition-all duration-300"
+            style={{ background: '#25D366' }}
           >
             <FaWhatsapp size={18} color="#ffffff" className="shrink-0" aria-hidden />
             Ask on WhatsApp

@@ -145,9 +145,9 @@ Message: ${form.message}`
               href="https://wa.me/14034985666?text=Hi%20Sam!%20I'd%20love%20to%20order%20a%20custom%20cake."
               target="_blank"
               rel="noreferrer"
-              whileHover={{ scale: 1.03 }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center justify-center gap-3 p-5 rounded-2xl font-body text-sm font-semibold tracking-widest uppercase text-white"
+              className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-body text-xs tracking-widest uppercase font-semibold text-white transition-all duration-300"
               style={{ background: '#25D366' }}
             >
               <FaWhatsapp size={18} color="#ffffff" className="shrink-0" aria-hidden />
