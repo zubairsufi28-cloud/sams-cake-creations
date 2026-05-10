@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { FaMapMarkerAlt, FaWhatsapp, FaEnvelope, FaInstagram, FaClock } from 'react-icons/fa'
+import { FaMapMarkerAlt, FaWhatsapp, FaGoogle, FaInstagram, FaClock, FaCreditCard } from 'react-icons/fa'
 
 const CONTACT_INFO_ITEMS = [
   { kind: 'location', label: 'Location', val: '274 Seton Villas SE', sub: 'Calgary, AB' },
   { kind: 'whatsapp', label: 'WhatsApp', val: '(403) 498-5666', sub: 'Text or call' },
   { kind: 'email', label: 'Email', val: 'samiabakedcreation@gmail.com', sub: 'We reply within 24hrs' },
   { kind: 'instagram', label: 'Instagram', val: '@samscakecreations_', sub: 'Follow for inspo' },
-  { kind: 'hours', label: 'Hours', val: 'Mon–Sat', sub: '9:00 AM – 7:00 PM' },
+  { kind: 'hours', label: 'Hours', val: 'Mon–Sat', sub: '9:00 AM – 7:00 PM', goldTile: true },
 ]
 
 function ContactInfoIcon({ kind }) {
@@ -18,7 +18,7 @@ function ContactInfoIcon({ kind }) {
     case 'whatsapp':
       return <FaWhatsapp size={size} color="#25D366" aria-hidden />
     case 'email':
-      return <FaEnvelope size={size} color="#EA4335" aria-hidden />
+      return <FaGoogle size={size} color="#EA4335" aria-hidden />
     case 'instagram':
       return <FaInstagram size={size} style={{ fill: 'url(#contact-insta-grad)' }} aria-hidden />
     case 'hours':
@@ -26,7 +26,7 @@ function ContactInfoIcon({ kind }) {
         <FaClock
           size={size}
           className="shrink-0"
-          style={{ color: '#a8852a' }}
+          style={{ color: '#c9a84c' }}
           aria-hidden
         />
       )
@@ -118,8 +118,18 @@ Message: ${form.message}`
 
             {CONTACT_INFO_ITEMS.map((item) => (
               <div key={item.label} className="glass-card rounded-2xl p-5 flex items-center gap-4 bg-cake-card">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-cake-bg"
-                  style={{ border: '1px solid #f5c0d5' }}>
+                <div
+                  className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl"
+                  style={
+                    item.goldTile
+                      ? {
+                          background: 'linear-gradient(145deg, rgba(240, 208, 128, 0.45), rgba(201, 168, 76, 0.28))',
+                          border: '1px solid rgba(201, 168, 76, 0.85)',
+                          boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+                        }
+                      : { background: '#fff5f7', border: '1px solid #f5c0d5' }
+                  }
+                >
                   <ContactInfoIcon kind={item.kind} />
                 </div>
                 <div>
@@ -138,18 +148,26 @@ Message: ${form.message}`
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               className="flex items-center justify-center gap-3 p-5 rounded-2xl font-body text-sm font-semibold tracking-widest uppercase text-white"
-              style={{ background: '#25d366' }}
+              style={{ background: '#25D366' }}
             >
-              <span className="text-xl">💬</span>
+              <FaWhatsapp size={22} className="shrink-0 text-white" aria-hidden />
               Order Directly on WhatsApp
             </motion.a>
 
             {/* Payment note */}
-            <div className="glass-card rounded-2xl p-5 bg-cake-card">
-              <div className="font-body text-xs text-gold-600 tracking-widest uppercase mb-2">💳 Payment</div>
-              <p className="font-body text-xs text-cake-muted leading-relaxed font-light">
-                We accept <span className="text-cake-ink font-medium">Cash</span> & <span className="text-cake-ink font-medium">e-Transfer</span>. A non-refundable deposit is required to secure your booking date.
-              </p>
+            <div className="glass-card rounded-2xl p-5 flex items-start gap-4 bg-cake-card">
+              <div
+                className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-cake-bg"
+                style={{ border: '1px solid #f5c0d5' }}
+              >
+                <FaCreditCard size={20} color="#c9a84c" aria-hidden />
+              </div>
+              <div>
+                <div className="font-body text-xs text-gold-600 tracking-widest uppercase mb-2">Payment</div>
+                <p className="font-body text-xs text-cake-muted leading-relaxed font-light">
+                  We accept <span className="text-cake-ink font-medium">Cash</span> & <span className="text-cake-ink font-medium">e-Transfer</span>. A non-refundable deposit is required to secure your booking date.
+                </p>
+              </div>
             </div>
           </motion.div>
 
