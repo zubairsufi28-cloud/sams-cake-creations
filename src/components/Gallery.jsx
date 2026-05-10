@@ -4,15 +4,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 const CATEGORIES = ['All', 'Wedding', 'Birthday', 'Baby Shower', 'Anniversary', 'Cookies']
 
 const CAKES = [
-  { id: 1, name: 'White Rose Elegance', category: 'Wedding', img: '/images/cake1.jpg', desc: 'Stunning white tier cake with delicate rose arrangements', price: 'From $380' },
-  { id: 2, name: 'Floral Cascade', category: 'Wedding', img: '/images/cake2.jpg', desc: 'Romantic multi-tier cake with cascading fresh florals', price: 'From $420' },
-  { id: 3, name: 'Golden Wedding Tier', category: 'Wedding', img: '/images/cake3.jpg', desc: 'Elegant wedding cake with gold accents and floral crown', price: 'From $350' },
-  { id: 4, name: 'Princess Birthday', category: 'Birthday', img: '/images/cake4.jpg', desc: 'Magical birthday cake with personalized name and themed design', price: 'From $160' },
-  { id: 5, name: 'Character Dream', category: 'Birthday', img: '/images/cake5.jpg', desc: 'Fun themed birthday cake with custom character decorations', price: 'From $175' },
-  { id: 6, name: 'Cloud Nine', category: 'Baby Shower', img: '/images/cake6.jpg', desc: 'Dreamy baby shower cake with soft pastel cloud details', price: 'From $190' },
-  { id: 7, name: 'Golden Anniversary', category: 'Anniversary', img: '/images/cake7.jpg', desc: 'Elegant anniversary cake with gold details and romantic finish', price: 'From $240' },
-  { id: 8, name: 'Modern Artisan', category: 'Birthday', img: '/images/cake8.jpg', desc: 'Contemporary cake design with unique artistic decorations', price: 'From $200' },
-  { id: 9, name: 'Artisan Cookies', category: 'Cookies', img: '/images/cake9.jpg', desc: 'Hand-decorated luxury cookies perfect for any occasion', price: 'From $45/dozen' },
+  { id: 1, name: 'White Rose Elegance', category: 'Wedding', img: '/images/cake1.jpg', desc: 'Stunning white tier cake with delicate rose arrangements' },
+  { id: 2, name: 'Floral Cascade', category: 'Wedding', img: '/images/cake2.jpg', desc: 'Romantic multi-tier cake with cascading fresh florals' },
+  { id: 3, name: 'Golden Wedding Tier', category: 'Wedding', img: '/images/cake3.jpg', desc: 'Elegant wedding cake with gold accents and floral crown' },
+  { id: 4, name: 'Princess Birthday', category: 'Birthday', img: '/images/cake4.jpg', desc: 'Magical birthday cake with personalized name and themed design' },
+  { id: 5, name: 'Character Dream', category: 'Birthday', img: '/images/cake5.jpg', desc: 'Fun themed birthday cake with custom character decorations' },
+  { id: 6, name: 'Cloud Nine', category: 'Baby Shower', img: '/images/cake6.jpg', desc: 'Dreamy baby shower cake with soft pastel cloud details' },
+  { id: 7, name: 'Golden Anniversary', category: 'Anniversary', img: '/images/cake7.jpg', desc: 'Elegant anniversary cake with gold details and romantic finish' },
+  { id: 8, name: 'Modern Artisan', category: 'Birthday', img: '/images/cake8.jpg', desc: 'Contemporary cake design with unique artistic decorations' },
+  { id: 9, name: 'Artisan Cookies', category: 'Cookies', img: '/images/cake9.jpg', desc: 'Hand-decorated luxury cookies perfect for any occasion' },
 ]
 
 function CakeCard({ cake, index }) {
@@ -64,19 +64,16 @@ function CakeCard({ cake, index }) {
         <div className="p-5">
           <h3 className="font-display text-xl italic font-bold text-cake-ink mb-2">{cake.name}</h3>
           <p className="font-body text-sm text-cake-muted leading-relaxed mb-4 font-light">{cake.desc}</p>
-          <div className="flex items-center justify-between">
-            <span className="font-display text-lg italic gold-text font-bold">{cake.price}</span>
-            <motion.a
-              href="https://wa.me/14034985666?text=Hi%20Sam!%20I'm%20interested%20in%20a%20custom%20cake."
+          <div className="flex items-center justify-end">
+            <a
+              href={`https://wa.me/14034985666?text=Hi%20Sam!%20I'm%20interested%20in%20the%20${encodeURIComponent(cake.name)}%20cake.%20Can%20I%20get%20a%20quote%3F`}
               target="_blank"
               rel="noreferrer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-4 py-2 rounded-full text-xs font-body font-semibold tracking-widest uppercase text-cake-ink"
-              style={{ background: 'linear-gradient(135deg, #f0d080, #c9a84c, #a8852a)' }}
+              className="px-4 py-2 rounded-full text-xs font-body font-semibold tracking-widest uppercase text-dark-900"
+              style={{ background: 'linear-gradient(135deg, #f0d080, #c9a84c)' }}
             >
-              Order
-            </motion.a>
+              Get a Quote
+            </a>
           </div>
         </div>
       </div>

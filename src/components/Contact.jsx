@@ -1,46 +1,25 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import emailjs from 'emailjs-com'
-
-// ⚠️ Replace these with your real EmailJS credentials from emailjs.com
-const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID'
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'
-const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY'
 
 const EVENTS = ['Wedding', 'Birthday', 'Baby Shower', 'Anniversary', 'Corporate', 'Cookies', 'Other']
 
 export default function Contact() {
-  const formRef = useRef(null)
-  const [form, setForm] = useState({ name: '', email: '', phone: '', event: '', date: '', guests: '', message: '' })
-  const [status, setStatus] = useState('idle') // idle | sending | success | error
+  const [form, setForm] = useState({ name: '', email: '', phone: '', event: '', date: '', size: '', message: '' })
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    setStatus('sending')
-    try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          from_name: form.name,
-          from_email: form.email,
-          phone: form.phone,
-          event_type: form.event,
-          event_date: form.date,
-          guests: form.guests,
-          message: form.message,
-        },
-        EMAILJS_PUBLIC_KEY
-      )
-      setStatus('success')
-      setForm({ name: '', email: '', phone: '', event: '', date: '', guests: '', message: '' })
-      setTimeout(() => setStatus('idle'), 5000)
-    } catch {
-      setStatus('error')
-      setTimeout(() => setStatus('idle'), 4000)
-    }
+    const message = `Hi Sam! I'd like to request a quote.
+
+Name: ${form.name}
+Email: ${form.email}
+Phone: ${form.phone}
+Event: ${form.event}
+Date: ${form.date}
+Cake size: ${form.size}
+Message: ${form.message}`
+    window.open(`https://wa.me/14034985666?text=${encodeURIComponent(message)}`, '_blank')
   }
 
   const inputClass = "w-full bg-cake-card border border-cake-line rounded-xl px-5 py-4 font-body text-sm text-cake-ink placeholder:text-cake-muted/40 outline-none focus:border-gold-500 transition-colors duration-300"
@@ -130,7 +109,7 @@ export default function Contact() {
             viewport={{ once: true }}
             className="lg:col-span-3"
           >
-            <form ref={formRef} onSubmit={handleSubmit} className="glass-card rounded-3xl p-8 flex flex-col gap-5 bg-cake-card">
+            <form onSubmit={handleSubmit} className="glass-card rounded-3xl p-8 flex flex-col gap-5 bg-cake-card">
               <h3 className="font-display text-2xl italic font-bold text-cake-ink mb-2">Request a Quote</h3>
 
               {/* Row 1 */}
@@ -185,12 +164,24 @@ export default function Contact() {
                   />
                 </div>
                 <div>
-                  <label className="block font-body text-xs text-cake-muted tracking-widest uppercase mb-2">Number of Guests</label>
-                  <input
-                    name="guests" value={form.guests} onChange={handleChange}
-                    placeholder="e.g. 50–80 guests"
-                    className={inputClass} style={inputStyle}
-                  />
+                  <label className="block font-body text-xs text-cake-muted tracking-widest uppercase mb-2">Cake Size</label>
+                  <select
+                    name="size"
+                    value={form.size}
+                    onChange={handleChange}
+                    className={inputClass}
+                    style={{ ...inputStyle, color: form.size ? '#2a0a18' : 'rgba(107, 48, 80, 0.45)' }}
+                  >
+                    <option value="">Select cake size</option>
+                    <option value="6 inch (serves 8–10)">6 inch (serves 8–10)</option>
+                    <option value="8 inch (serves 15–20)">8 inch (serves 15–20)</option>
+                    <option value="10 inch (serves 25–30)">10 inch (serves 25–30)</option>
+                    <option value="12 inch (serves 35–40)">12 inch (serves 35–40)</option>
+                    <option value="2 tier (serves 30–45)">2 tier (serves 30–45)</option>
+                    <option value="3 tier (serves 50–75)">3 tier (serves 50–75)</option>
+                    <option value="4 tier (serves 80–120)">4 tier (serves 80–120)</option>
+                    <option value="Custom size (servings on request)">Custom size (servings on request)</option>
+                  </select>
                 </div>
               </div>
 
@@ -208,24 +199,14 @@ export default function Contact() {
               {/* Submit */}
               <motion.button
                 type="submit"
-                disabled={status === 'sending'}
-                whileHover={{ scale: status === 'sending' ? 1 : 1.02 }}
+                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="w-full py-4 rounded-xl font-body text-sm tracking-widest uppercase font-semibold text-cake-ink transition-all duration-300"
                 style={{
-                  background: status === 'success'
-                    ? 'linear-gradient(135deg, #4caf7d, #2e7d52)'
-                    : status === 'error'
-                    ? 'linear-gradient(135deg, #e57373, #c62828)'
-                    : 'linear-gradient(135deg, #f0d080, #c9a84c, #a8852a)',
-                  opacity: status === 'sending' ? 0.7 : 1,
-                  color: status === 'success' || status === 'error' ? '#ffffff' : '#2a0a18',
+                  background: 'linear-gradient(135deg, #f0d080, #c9a84c, #a8852a)',
                 }}
               >
-                {status === 'idle' && '✨ Send My Request'}
-                {status === 'sending' && '⏳ Sending...'}
-                {status === 'success' && '✓ Request Sent! We\'ll be in touch soon.'}
-                {status === 'error' && '✗ Something went wrong. Try WhatsApp instead.'}
+                ✨ Send My Request
               </motion.button>
 
               <p className="font-body text-xs text-cake-muted/70 text-center">
