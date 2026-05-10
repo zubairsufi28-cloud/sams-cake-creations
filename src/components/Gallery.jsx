@@ -7,13 +7,25 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 
 const CATEGORIES = ['All', 'Wedding', 'Birthday', 'Baby Shower', 'Anniversary', 'Cookies', 'Other']
 
+function photosFromRow(row) {
+  if (Array.isArray(row.image_urls) && row.image_urls.length > 0) {
+    return row.image_urls.filter((u) => typeof u === 'string' && u.length > 0)
+  }
+  // Legacy single column (if migration not run yet)
+  if (row.image_url) {
+    return [row.image_url]
+  }
+  return []
+}
+
 function mapGalleryRow(row) {
+  const photos = photosFromRow(row)
   return {
     id: row.id,
     name: row.name,
     category: row.category,
     desc: row.description || '',
-    photos: [row.image_url, row.image_url],
+    photos,
   }
 }
 
@@ -163,7 +175,7 @@ export default function Gallery() {
       .select('*')
       .order('created_at', { ascending: false })
     if (!error && Array.isArray(data)) {
-      setRemoteCakes(data.map(mapGalleryRow))
+      setRemoteCakes(data.map(mapGalleryRow).filter((c) => c.photos.length > 0))
     }
   }, [])
 
@@ -186,7 +198,7 @@ export default function Gallery() {
   }, [loadRemote])
 
   const cakes = useMemo(
-    () => [...remoteCakes, ...DEFAULT_GALLERY_CAKES],
+    () => [...remoteCakes.filter((c) => c.photos.length > 0), ...DEFAULT_GALLERY_CAKES],
     [remoteCakes]
   )
 
