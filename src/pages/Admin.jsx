@@ -7,17 +7,10 @@ const ADMIN_PASSWORD = 'Sam2024Admin'
 const AUTH_KEY = 'sam_cake_admin_ok'
 
 const CATEGORIES = ['Wedding', 'Birthday', 'Baby Shower', 'Anniversary', 'Cookies', 'Other']
-const PHOTO_SLOTS = 5
-
-function emptySlots() {
-  return Array(PHOTO_SLOTS).fill(null)
-}
 
 function thumbUrl(row) {
-  if (Array.isArray(row.image_urls) && row.image_urls.length > 0 && row.image_urls[0]) {
-    return row.image_urls[0]
-  }
   if (row.image_url) return row.image_url
+  if (Array.isArray(row.image_urls) && row.image_urls[0]) return row.image_urls[0]
   return null
 }
 
@@ -28,25 +21,22 @@ export default function Admin() {
 
   const [cakes, setCakes] = useState([])
 
+  const [editingId, setEditingId] = useState(null)
   const [name, setName] = useState('')
   const [category, setCategory] = useState(CATEGORIES[0])
   const [description, setDescription] = useState('')
-  const [slotFiles, setSlotFiles] = useState(emptySlots)
+  const [photoFile, setPhotoFile] = useState(null)
 
   const [saving, setSaving] = useState(false)
   const [saveMsg, setSaveMsg] = useState('')
   const [saveErr, setSaveErr] = useState('')
 
-  const previewUrls = useMemo(
-    () => slotFiles.map((f) => (f ? URL.createObjectURL(f) : null)),
-    [slotFiles]
-  )
-
+  const previewBlob = useMemo(() => (photoFile ? URL.createObjectURL(photoFile) : null), [photoFile])
   useEffect(() => {
     return () => {
-      previewUrls.forEach((u) => u && URL.revokeObjectURL(u))
+      if (previewBlob) URL.revokeObjectURL(previewBlob)
     }
-  }, [previewUrls])
+  }, [previewBlob])
 
   const loadCakes = useCallback(async () => {
     if (!isSupabaseConfigured() || !supabase) return
@@ -63,15 +53,23 @@ export default function Admin() {
     if (authed) loadCakes()
   }, [authed, loadCakes])
 
-  const setSlotFile = (index, file) => {
-    setSlotFiles((prev) => {
-      const next = [...prev]
-      next[index] = file
-      return next
-    })
+  const resetForm = () => {
+    setEditingId(null)
+    setName('')
+    setCategory(CATEGORIES[0])
+    setDescription('')
+    setPhotoFile(null)
   }
 
-  const clearSlots = () => setSlotFiles(emptySlots())
+  const startEdit = (row) => {
+    setEditingId(row.id)
+    setName(row.name || '')
+    setCategory(CATEGORIES.includes(row.category) ? row.category : CATEGORIES[0])
+    setDescription(row.description || '')
+    setPhotoFile(null)
+    setSaveMsg('')
+    setSaveErr('')
+  }
 
   const handleLogin = (e) => {
     e.preventDefault()
@@ -99,10 +97,11 @@ export default function Admin() {
       window.alert(error.message || 'Delete failed')
       return
     }
+    if (editingId === row.id) resetForm()
     await loadCakes()
   }
 
-  const handleSave = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setSaveMsg('')
     setSaveErr('')
@@ -115,31 +114,42 @@ export default function Admin() {
       setSaveErr('Please enter a cake name.')
       return
     }
-    const filesToUpload = slotFiles.filter(Boolean)
-    if (filesToUpload.length === 0) {
-      setSaveErr('Please add at least one photo (any slot).')
-      return
-    }
-    if (filesToUpload.length > PHOTO_SLOTS) {
-      setSaveErr(`Maximum ${PHOTO_SLOTS} photos.`)
+
+    const isNew = !editingId
+    if (isNew && !photoFile) {
+      setSaveErr('Please choose a photo for a new cake.')
       return
     }
 
     setSaving(true)
     try {
-      const imageUrls = await Promise.all(filesToUpload.map((f) => uploadCakeImage(f)))
-      const { error } = await supabase.from('gallery_cakes').insert({
-        name: name.trim(),
-        category,
-        description: description.trim(),
-        image_urls: imageUrls,
-      })
-      if (error) throw error
-      setSaveMsg('Saved! The gallery will update automatically.')
-      setName('')
-      setDescription('')
-      setCategory(CATEGORIES[0])
-      clearSlots()
+      let imageUrl
+      if (photoFile) {
+        imageUrl = await uploadCakeImage(photoFile)
+      }
+
+      if (editingId) {
+        const payload = {
+          name: name.trim(),
+          category,
+          description: description.trim(),
+        }
+        if (imageUrl) payload.image_url = imageUrl
+        const { error } = await supabase.from('gallery_cakes').update(payload).eq('id', editingId)
+        if (error) throw error
+        setSaveMsg('Updated.')
+      } else {
+        const { error } = await supabase.from('gallery_cakes').insert({
+          name: name.trim(),
+          category,
+          description: description.trim(),
+          image_url: imageUrl,
+        })
+        if (error) throw error
+        setSaveMsg('Saved! The gallery will update automatically.')
+      }
+
+      resetForm()
       await loadCakes()
     } catch (err) {
       setSaveErr(err.message || 'Something went wrong.')
@@ -156,6 +166,9 @@ export default function Admin() {
     if (!import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET) missing.push('VITE_CLOUDINARY_UPLOAD_PRESET')
     return missing
   })()
+
+  const editingRow = editingId ? cakes.find((c) => c.id === editingId) : null
+  const photoPreview = previewBlob || (editingRow ? thumbUrl(editingRow) : null)
 
   if (!authed) {
     return (
@@ -232,14 +245,13 @@ export default function Admin() {
         ) : null}
 
         <section className="mb-10">
-          <h2 className="font-body text-xs text-cake-muted tracking-widest uppercase mb-3">Cakes in gallery</h2>
+          <h2 className="font-body text-xs text-cake-muted tracking-widest uppercase mb-3">Your cakes</h2>
           {cakes.length === 0 ? (
-            <p className="font-body text-sm text-cake-muted">No cakes from the database yet.</p>
+            <p className="font-body text-sm text-cake-muted">No cakes in the database yet.</p>
           ) : (
             <ul className="flex flex-col gap-3">
               {cakes.map((row) => {
                 const thumb = thumbUrl(row)
-                const count = Array.isArray(row.image_urls) ? row.image_urls.length : row.image_url ? 1 : 0
                 return (
                   <li
                     key={row.id}
@@ -254,18 +266,24 @@ export default function Admin() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="font-body text-sm font-semibold text-cake-ink truncate">{row.name}</div>
-                      <div className="font-body text-xs text-cake-muted">
-                        {row.category}
-                        {count > 0 ? ` · ${count} photo${count === 1 ? '' : 's'}` : ''}
-                      </div>
+                      <div className="font-body text-xs text-cake-muted">{row.category}</div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(row)}
-                      className="shrink-0 rounded-full border border-red-200 bg-red-50 px-3 py-2 font-body text-xs font-semibold uppercase tracking-wider text-red-700 min-h-[44px]"
-                    >
-                      Delete
-                    </button>
+                    <div className="flex shrink-0 flex-col gap-1 sm:flex-row sm:gap-2">
+                      <button
+                        type="button"
+                        onClick={() => startEdit(row)}
+                        className="rounded-full border border-cake-line bg-cake-bg px-3 py-2 font-body text-xs font-semibold uppercase tracking-wider text-cake-ink min-h-[40px]"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(row)}
+                        className="rounded-full border border-red-200 bg-red-50 px-3 py-2 font-body text-xs font-semibold uppercase tracking-wider text-red-700 min-h-[40px]"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </li>
                 )
               })}
@@ -273,38 +291,35 @@ export default function Admin() {
           )}
         </section>
 
-        <h2 className="font-body text-xs text-cake-muted tracking-widest uppercase mb-4">Add new cake</h2>
+        <h2 className="font-body text-xs text-cake-muted tracking-widest uppercase mb-4">
+          {editingId ? 'Edit cake' : 'Add new cake'}
+        </h2>
 
-        <form onSubmit={handleSave} className="flex flex-col gap-5">
-          <div>
+        {editingId ? (
+          <button
+            type="button"
+            onClick={resetForm}
+            className="mb-4 font-body text-sm text-gold-600 underline"
+          >
+            Cancel edit — add new instead
+          </button>
+        ) : null}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <label className="block">
             <span className="font-body text-xs text-cake-muted tracking-widest uppercase mb-2 block">
-              Photos (1–{PHOTO_SLOTS} slots) *
+              Photo {editingId ? '(optional — keep current if unchanged)' : '*'}
             </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {slotFiles.map((file, i) => (
-                <label
-                  key={i}
-                  className="block rounded-xl border border-cake-line bg-white p-3"
-                >
-                  <span className="font-body text-xs text-gold-600 mb-2 block">Photo {i + 1}</span>
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/heic"
-                    onChange={(e) => setSlotFile(i, e.target.files?.[0] || null)}
-                    className="w-full font-body text-xs text-cake-ink file:mr-2 file:rounded-lg file:border-0 file:bg-gold-500 file:px-2 file:py-2 file:font-body file:text-[10px] file:font-semibold file:text-cake-ink"
-                  />
-                  {previewUrls[i] ? (
-                    <img
-                      src={previewUrls[i]}
-                      alt=""
-                      className="mt-2 w-full max-h-32 rounded-lg object-contain bg-cake-section"
-                    />
-                  ) : null}
-                </label>
-              ))}
-            </div>
-            <p className="mt-2 font-body text-xs text-cake-muted">Fill at least one slot. All chosen images upload to Cloudinary.</p>
-          </div>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/heic"
+              onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
+              className="w-full font-body text-sm text-cake-ink file:mr-3 file:rounded-lg file:border-0 file:bg-gold-500 file:px-4 file:py-2.5 file:font-body file:text-xs file:font-semibold file:text-cake-ink min-h-[48px]"
+            />
+            {photoPreview ? (
+              <img src={photoPreview} alt="" className="mt-3 w-full max-h-64 rounded-xl object-contain bg-cake-section border border-cake-line" />
+            ) : null}
+          </label>
 
           <label className="block">
             <span className="font-body text-xs text-cake-muted tracking-widest uppercase mb-2 block">Cake name *</span>
@@ -350,7 +365,7 @@ export default function Admin() {
             className="min-h-[52px] rounded-full font-body text-sm font-semibold tracking-widest uppercase text-white disabled:opacity-60 transition-opacity"
             style={{ background: 'linear-gradient(135deg, #f0d080, #c9a84c, #a8852a)' }}
           >
-            {saving ? 'Saving…' : 'Save to gallery'}
+            {saving ? 'Saving…' : editingId ? 'Save changes' : 'Save to gallery'}
           </button>
         </form>
       </div>
