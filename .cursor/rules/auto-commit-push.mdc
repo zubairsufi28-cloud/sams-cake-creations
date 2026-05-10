@@ -1,0 +1,14 @@
+---
+description: After editing project files, commit and push to GitHub immediately.
+alwaysApply: true
+---
+
+# Git: commit and push after changes
+
+Whenever you modify, create, or delete tracked source or config files in this repository (not `node_modules`), immediately afterward run:
+
+1. `git add` for the files you changed (never stage `node_modules` unless the user explicitly asks).
+2. `git commit -m "<short imperative description of what changed>"`
+3. `git push`
+
+Do this in the same turn as the edits unless the user forbids git operations or authentication will fail (then say so and stop).

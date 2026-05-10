@@ -3,6 +3,18 @@ import { motion } from 'framer-motion'
 
 const EVENTS = ['Wedding', 'Birthday', 'Baby Shower', 'Anniversary', 'Corporate', 'Cookies', 'Other']
 
+/** Inch rounds, tier stacks, and custom — replaces legacy “number of guests” free-text field. */
+const CAKE_SIZE_OPTIONS = [
+  { value: '6 inch (serves 8–10)', label: '6 inch (serves 8–10)' },
+  { value: '8 inch (serves 15–20)', label: '8 inch (serves 15–20)' },
+  { value: '10 inch (serves 25–30)', label: '10 inch (serves 25–30)' },
+  { value: '12 inch (serves 35–40)', label: '12 inch (serves 35–40)' },
+  { value: '2 tier (serves 30–45)', label: '2 tier (serves 30–45)' },
+  { value: '3 tier (serves 50–75)', label: '3 tier (serves 50–75)' },
+  { value: '4 tier (serves 80–120)', label: '4 tier (serves 80–120)' },
+  { value: 'Custom size (servings on request)', label: 'Custom size (servings on request)' },
+]
+
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', event: '', date: '', size: '', message: '' })
 
@@ -164,8 +176,9 @@ Message: ${form.message}`
                   />
                 </div>
                 <div>
-                  <label className="block font-body text-xs text-cake-muted tracking-widest uppercase mb-2">Cake Size</label>
+                  <label htmlFor="contact-cake-size" className="block font-body text-xs text-cake-muted tracking-widest uppercase mb-2">Cake Size</label>
                   <select
+                    id="contact-cake-size"
                     name="size"
                     value={form.size}
                     onChange={handleChange}
@@ -173,14 +186,9 @@ Message: ${form.message}`
                     style={{ ...inputStyle, color: form.size ? '#2a0a18' : 'rgba(107, 48, 80, 0.45)' }}
                   >
                     <option value="">Select cake size</option>
-                    <option value="6 inch (serves 8–10)">6 inch (serves 8–10)</option>
-                    <option value="8 inch (serves 15–20)">8 inch (serves 15–20)</option>
-                    <option value="10 inch (serves 25–30)">10 inch (serves 25–30)</option>
-                    <option value="12 inch (serves 35–40)">12 inch (serves 35–40)</option>
-                    <option value="2 tier (serves 30–45)">2 tier (serves 30–45)</option>
-                    <option value="3 tier (serves 50–75)">3 tier (serves 50–75)</option>
-                    <option value="4 tier (serves 80–120)">4 tier (serves 80–120)</option>
-                    <option value="Custom size (servings on request)">Custom size (servings on request)</option>
+                    {CAKE_SIZE_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value} style={{ background: '#ffffff', color: '#2a0a18' }}>{opt.label}</option>
+                    ))}
                   </select>
                 </div>
               </div>
