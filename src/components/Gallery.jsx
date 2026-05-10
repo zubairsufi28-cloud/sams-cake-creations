@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { FaInstagram } from 'react-icons/fa'
 
 const CATEGORIES = ['All', 'Wedding', 'Birthday', 'Baby Shower', 'Anniversary', 'Cookies']
 
@@ -162,6 +163,17 @@ export default function Gallery() {
       <div className="absolute top-0 left-0 right-0 h-px"
         style={{ background: 'linear-gradient(90deg, transparent, #f5c0d5, transparent)' }} />
 
+      <svg className="pointer-events-none absolute h-0 w-0 overflow-hidden" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="gallery-insta-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#fdf497" />
+            <stop offset="25%" stopColor="#fd5949" />
+            <stop offset="55%" stopColor="#d6249f" />
+            <stop offset="100%" stopColor="#833ab4" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -240,9 +252,15 @@ export default function Gallery() {
             rel="noreferrer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-body text-sm tracking-widest uppercase font-semibold border border-cake-line text-cake-ink bg-cake-card/80 hover:border-gold-500/40 transition-colors"
+            className="relative inline-flex items-center gap-3 px-8 py-4 rounded-full font-body text-sm tracking-widest uppercase font-semibold border border-cake-line text-cake-ink bg-cake-card/80 hover:border-gold-500/40 transition-colors"
           >
-            📸 Follow @samscakecreations_
+            <FaInstagram
+              className="shrink-0 drop-shadow-sm"
+              size={32}
+              aria-hidden
+              style={{ fill: 'url(#gallery-insta-grad)' }}
+            />
+            Follow @samscakecreations_
           </motion.a>
         </motion.div>
       </div>
