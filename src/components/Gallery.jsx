@@ -1,21 +1,21 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { FaInstagram } from 'react-icons/fa'
+import { DEFAULT_GALLERY_CAKES } from '../data/galleryDefaults'
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 
-const CATEGORIES = ['All', 'Wedding', 'Birthday', 'Baby Shower', 'Anniversary', 'Cookies']
+const CATEGORIES = ['All', 'Wedding', 'Birthday', 'Baby Shower', 'Anniversary', 'Cookies', 'Other']
 
-const CAKES = [
-  { id: 1, name: 'White Rose Elegance', category: 'Wedding', photos: ['/images/cake1.jpg', '/images/cake1.jpg'], desc: 'Stunning white tier cake with delicate rose arrangements' },
-  { id: 2, name: 'Floral Cascade', category: 'Wedding', photos: ['/images/cake2.jpg', '/images/cake2.jpg'], desc: 'Romantic multi-tier cake with cascading fresh florals' },
-  { id: 3, name: 'Golden Wedding Tier', category: 'Wedding', photos: ['/images/cake3.jpg', '/images/cake3.jpg'], desc: 'Elegant wedding cake with gold accents and floral crown' },
-  { id: 4, name: 'Princess Birthday', category: 'Birthday', photos: ['/images/cake4.jpg', '/images/cake4.jpg'], desc: 'Magical birthday cake with personalized name and themed design' },
-  { id: 5, name: 'Character Dream', category: 'Birthday', photos: ['/images/cake5.jpg', '/images/cake5.jpg'], desc: 'Fun themed birthday cake with custom character decorations' },
-  { id: 6, name: 'Cloud Nine', category: 'Baby Shower', photos: ['/images/cake6.jpg', '/images/cake6.jpg'], desc: 'Dreamy baby shower cake with soft pastel cloud details' },
-  { id: 7, name: 'Golden Anniversary', category: 'Anniversary', photos: ['/images/cake7.jpg', '/images/cake7.jpg'], desc: 'Elegant anniversary cake with gold details and romantic finish' },
-  { id: 8, name: 'Modern Artisan', category: 'Birthday', photos: ['/images/cake8.jpg', '/images/cake8.jpg'], desc: 'Contemporary cake design with unique artistic decorations' },
-  { id: 9, name: 'Artisan Cookies', category: 'Cookies', photos: ['/images/cake9.jpg', '/images/cake9.jpg'], desc: 'Hand-decorated luxury cookies perfect for any occasion' },
-]
+function mapGalleryRow(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    category: row.category,
+    desc: row.description || '',
+    photos: [row.image_url, row.image_url],
+  }
+}
 
 function CakeCard({ cake, index }) {
   const cardRef = useRef(null)
@@ -154,8 +154,43 @@ function CakeCard({ cake, index }) {
 
 export default function Gallery() {
   const [active, setActive] = useState('All')
+  const [remoteCakes, setRemoteCakes] = useState([])
 
-  const filtered = active === 'All' ? CAKES : CAKES.filter(c => c.category === active)
+  const loadRemote = useCallback(async () => {
+    if (!isSupabaseConfigured() || !supabase) return
+    const { data, error } = await supabase
+      .from('gallery_cakes')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (!error && Array.isArray(data)) {
+      setRemoteCakes(data.map(mapGalleryRow))
+    }
+  }, [])
+
+  useEffect(() => {
+    loadRemote()
+    if (!supabase) return undefined
+    const channel = supabase
+      .channel('gallery_cakes_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'gallery_cakes' },
+        () => {
+          loadRemote()
+        }
+      )
+      .subscribe()
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [loadRemote])
+
+  const cakes = useMemo(
+    () => [...remoteCakes, ...DEFAULT_GALLERY_CAKES],
+    [remoteCakes]
+  )
+
+  const filtered = active === 'All' ? cakes : cakes.filter(c => c.category === active)
 
   return (
     <section id="gallery" className="section-pad bg-cake-section relative" style={{ marginTop: 0 }}>
