@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { FaWhatsapp } from 'react-icons/fa'
 
 const NAV_LINKS = ['Home', 'Gallery', 'Services', 'About', 'Testimonials', 'FAQ', 'Contact']
 
@@ -77,10 +78,11 @@ export default function Navbar() {
               rel="noreferrer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
-              className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full font-body text-xs tracking-widest uppercase font-semibold text-gray-900 transition-all duration-300"
-              style={{ background: 'linear-gradient(135deg, #f0d080, #c9a84c, #a8852a)' }}
+              className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full font-body text-xs tracking-widest uppercase font-semibold text-white transition-all duration-300"
+              style={{ background: '#25D366' }}
             >
-              <span>💬</span> Order Now
+              <FaWhatsapp size={18} className="shrink-0" aria-hidden />
+              Order Now
             </motion.a>
 
             {/* Hamburger */}
@@ -127,10 +129,11 @@ export default function Navbar() {
                 href="https://wa.me/14034985666"
                 target="_blank"
                 rel="noreferrer"
-                className="mt-2 flex items-center justify-center gap-2 px-6 py-3 rounded-full font-body text-sm tracking-widest uppercase font-semibold text-cake-ink"
-                style={{ background: 'linear-gradient(135deg, #f0d080, #c9a84c, #a8852a)' }}
+                className="mt-2 flex items-center justify-center gap-2 px-6 py-3 rounded-full font-body text-sm tracking-widest uppercase font-semibold text-white"
+                style={{ background: '#25D366' }}
               >
-                💬 Order on WhatsApp
+                <FaWhatsapp size={20} className="shrink-0" aria-hidden />
+                Order on WhatsApp
               </motion.a>
             </div>
           </motion.div>

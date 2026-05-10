@@ -18,11 +18,18 @@ function ContactInfoIcon({ kind }) {
     case 'whatsapp':
       return <FaWhatsapp size={size} color="#25D366" aria-hidden />
     case 'email':
-      return <FaEnvelope size={size} color="#c9a84c" aria-hidden />
+      return <FaEnvelope size={size} color="#EA4335" aria-hidden />
     case 'instagram':
       return <FaInstagram size={size} style={{ fill: 'url(#contact-insta-grad)' }} aria-hidden />
     case 'hours':
-      return <FaClock size={size} color="#c9a84c" aria-hidden />
+      return (
+        <FaClock
+          size={size}
+          className="shrink-0"
+          style={{ color: '#a8852a' }}
+          aria-hidden
+        />
+      )
     default:
       return null
   }
