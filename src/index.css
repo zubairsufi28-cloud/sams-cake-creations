@@ -170,7 +170,7 @@ body {
 
 #gallery.section-pad {
   margin-top: 0 !important;
-  padding-top: 0 !important;
+  padding-top: 4.5rem !important;
   padding-left: 5% !important;
   padding-right: 5% !important;
   padding-bottom: 70px !important;
@@ -178,6 +178,7 @@ body {
 
 @media (min-width: 769px) {
   #gallery.section-pad {
+    padding-top: 6.5rem !important;
     padding-bottom: 100px !important;
   }
 }

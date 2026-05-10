@@ -1,22 +1,29 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const CATEGORIES = ['All', 'Wedding', 'Birthday', 'Baby Shower', 'Anniversary', 'Cookies']
 
 const CAKES = [
-  { id: 1, name: 'White Rose Elegance', category: 'Wedding', img: '/images/cake1.jpg', desc: 'Stunning white tier cake with delicate rose arrangements' },
-  { id: 2, name: 'Floral Cascade', category: 'Wedding', img: '/images/cake2.jpg', desc: 'Romantic multi-tier cake with cascading fresh florals' },
-  { id: 3, name: 'Golden Wedding Tier', category: 'Wedding', img: '/images/cake3.jpg', desc: 'Elegant wedding cake with gold accents and floral crown' },
-  { id: 4, name: 'Princess Birthday', category: 'Birthday', img: '/images/cake4.jpg', desc: 'Magical birthday cake with personalized name and themed design' },
-  { id: 5, name: 'Character Dream', category: 'Birthday', img: '/images/cake5.jpg', desc: 'Fun themed birthday cake with custom character decorations' },
-  { id: 6, name: 'Cloud Nine', category: 'Baby Shower', img: '/images/cake6.jpg', desc: 'Dreamy baby shower cake with soft pastel cloud details' },
-  { id: 7, name: 'Golden Anniversary', category: 'Anniversary', img: '/images/cake7.jpg', desc: 'Elegant anniversary cake with gold details and romantic finish' },
-  { id: 8, name: 'Modern Artisan', category: 'Birthday', img: '/images/cake8.jpg', desc: 'Contemporary cake design with unique artistic decorations' },
-  { id: 9, name: 'Artisan Cookies', category: 'Cookies', img: '/images/cake9.jpg', desc: 'Hand-decorated luxury cookies perfect for any occasion' },
+  { id: 1, name: 'White Rose Elegance', category: 'Wedding', photos: ['/images/cake1.jpg', '/images/cake1.jpg'], desc: 'Stunning white tier cake with delicate rose arrangements' },
+  { id: 2, name: 'Floral Cascade', category: 'Wedding', photos: ['/images/cake2.jpg', '/images/cake2.jpg'], desc: 'Romantic multi-tier cake with cascading fresh florals' },
+  { id: 3, name: 'Golden Wedding Tier', category: 'Wedding', photos: ['/images/cake3.jpg', '/images/cake3.jpg'], desc: 'Elegant wedding cake with gold accents and floral crown' },
+  { id: 4, name: 'Princess Birthday', category: 'Birthday', photos: ['/images/cake4.jpg'], desc: 'Magical birthday cake with personalized name and themed design' },
+  { id: 5, name: 'Character Dream', category: 'Birthday', photos: ['/images/cake5.jpg'], desc: 'Fun themed birthday cake with custom character decorations' },
+  { id: 6, name: 'Cloud Nine', category: 'Baby Shower', photos: ['/images/cake6.jpg'], desc: 'Dreamy baby shower cake with soft pastel cloud details' },
+  { id: 7, name: 'Golden Anniversary', category: 'Anniversary', photos: ['/images/cake7.jpg'], desc: 'Elegant anniversary cake with gold details and romantic finish' },
+  { id: 8, name: 'Modern Artisan', category: 'Birthday', photos: ['/images/cake8.jpg'], desc: 'Contemporary cake design with unique artistic decorations' },
+  { id: 9, name: 'Artisan Cookies', category: 'Cookies', photos: ['/images/cake9.jpg'], desc: 'Hand-decorated luxury cookies perfect for any occasion' },
 ]
 
 function CakeCard({ cake, index }) {
   const cardRef = useRef(null)
+  const photos = cake.photos
+  const [photoIndex, setPhotoIndex] = useState(0)
+
+  useEffect(() => {
+    setPhotoIndex(0)
+  }, [cake.id])
 
   const handleMouseMove = (e) => {
     const rect = cardRef.current?.getBoundingClientRect()
@@ -28,6 +35,16 @@ function CakeCard({ cake, index }) {
 
   const handleMouseLeave = () => {
     if (cardRef.current) cardRef.current.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)'
+  }
+
+  const showCarousel = photos.length > 1
+  const goPrev = (e) => {
+    e.stopPropagation()
+    setPhotoIndex((i) => (i - 1 + photos.length) % photos.length)
+  }
+  const goNext = (e) => {
+    e.stopPropagation()
+    setPhotoIndex((i) => (i + 1) % photos.length)
   }
 
   return (
@@ -48,16 +65,63 @@ function CakeCard({ cake, index }) {
         }}
       >
         <div className="relative overflow-hidden" style={{ aspectRatio: '4/3', background: '#fff5f7' }}>
-          <img
-            src={cake.img}
-            alt={cake.name}
-            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-          <span className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-body tracking-widest uppercase"
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={`${cake.id}-${photoIndex}`}
+              src={photos[photoIndex]}
+              alt={`${cake.name} — photo ${photoIndex + 1} of ${photos.length}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+            />
+          </AnimatePresence>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+          <span className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-body tracking-widest uppercase pointer-events-none z-[1]"
             style={{ background: 'rgba(201,168,76,0.9)', color: '#2a0a18' }}>
             {cake.category}
           </span>
+
+          {showCarousel && (
+            <>
+              <button
+                type="button"
+                onClick={goPrev}
+                aria-label="Previous photo"
+                className="absolute left-2 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/35 text-white opacity-0 backdrop-blur-sm transition-opacity duration-300 hover:bg-black/50 group-hover:opacity-100"
+              >
+                <ChevronLeft className="h-5 w-5" strokeWidth={2.25} />
+              </button>
+              <button
+                type="button"
+                onClick={goNext}
+                aria-label="Next photo"
+                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/35 text-white opacity-0 backdrop-blur-sm transition-opacity duration-300 hover:bg-black/50 group-hover:opacity-100"
+              >
+                <ChevronRight className="h-5 w-5" strokeWidth={2.25} />
+              </button>
+              <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+                {photos.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-label={`Show photo ${i + 1}`}
+                    aria-current={i === photoIndex}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setPhotoIndex(i)
+                    }}
+                    className="h-1.5 rounded-full transition-all duration-300"
+                    style={{
+                      width: i === photoIndex ? '1.25rem' : '0.375rem',
+                      background: i === photoIndex ? 'rgba(240,208,128,0.95)' : 'rgba(255,255,255,0.45)',
+                    }}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Info */}
