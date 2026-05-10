@@ -1,5 +1,32 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { FaMapMarkerAlt, FaWhatsapp, FaEnvelope, FaInstagram, FaClock } from 'react-icons/fa'
+
+const CONTACT_INFO_ITEMS = [
+  { kind: 'location', label: 'Location', val: '274 Seton Villas SE', sub: 'Calgary, AB' },
+  { kind: 'whatsapp', label: 'WhatsApp', val: '(403) 498-5666', sub: 'Text or call' },
+  { kind: 'email', label: 'Email', val: 'samiabakedcreation@gmail.com', sub: 'We reply within 24hrs' },
+  { kind: 'instagram', label: 'Instagram', val: '@samscakecreations_', sub: 'Follow for inspo' },
+  { kind: 'hours', label: 'Hours', val: 'Mon–Sat', sub: '9:00 AM – 7:00 PM' },
+]
+
+function ContactInfoIcon({ kind }) {
+  const size = 20
+  switch (kind) {
+    case 'location':
+      return <FaMapMarkerAlt size={size} color="#DC2626" aria-hidden />
+    case 'whatsapp':
+      return <FaWhatsapp size={size} color="#25D366" aria-hidden />
+    case 'email':
+      return <FaEnvelope size={size} color="#c9a84c" aria-hidden />
+    case 'instagram':
+      return <FaInstagram size={size} style={{ fill: 'url(#contact-insta-grad)' }} aria-hidden />
+    case 'hours':
+      return <FaClock size={size} color="#c9a84c" aria-hidden />
+    default:
+      return null
+  }
+}
 
 const EVENTS = ['Wedding', 'Birthday', 'Baby Shower', 'Anniversary', 'Corporate', 'Cookies', 'Other']
 
@@ -39,6 +66,17 @@ Message: ${form.message}`
 
   return (
     <section id="contact" className="section-pad bg-cake-bg relative">
+      <svg className="pointer-events-none absolute h-0 w-0 overflow-hidden" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="contact-insta-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#833ab4" />
+            <stop offset="35%" stopColor="#d6249f" />
+            <stop offset="65%" stopColor="#fd5949" />
+            <stop offset="100%" stopColor="#fcb045" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -71,17 +109,11 @@ Message: ${form.message}`
           >
             <h3 className="font-display text-2xl italic font-bold text-cake-ink">Get in Touch</h3>
 
-            {[
-              { icon: '📍', label: 'Location', val: '274 Seton Villas SE', sub: 'Calgary, AB' },
-              { icon: '📱', label: 'WhatsApp', val: '(403) 498-5666', sub: 'Text or call' },
-              { icon: '📧', label: 'Email', val: 'samiabakedcreation@gmail.com', sub: 'We reply within 24hrs' },
-              { icon: '📸', label: 'Instagram', val: '@samscakecreations_', sub: 'Follow for inspo' },
-              { icon: '🕐', label: 'Hours', val: 'Mon–Sat', sub: '9:00 AM – 7:00 PM' },
-            ].map((item) => (
+            {CONTACT_INFO_ITEMS.map((item) => (
               <div key={item.label} className="glass-card rounded-2xl p-5 flex items-center gap-4 bg-cake-card">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 bg-cake-bg"
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-cake-bg"
                   style={{ border: '1px solid #f5c0d5' }}>
-                  {item.icon}
+                  <ContactInfoIcon kind={item.kind} />
                 </div>
                 <div>
                   <div className="font-body text-xs text-gold-600/90 tracking-widest uppercase mb-0.5">{item.label}</div>
