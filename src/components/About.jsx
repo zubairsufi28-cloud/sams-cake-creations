@@ -32,7 +32,7 @@ export default function About() {
               }}
             >
               <img
-                src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80"
+                src="https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?w=800&q=80"
                 alt="Sam's Cake Creations"
                 style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 24 }}
               />
