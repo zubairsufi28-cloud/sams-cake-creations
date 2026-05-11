@@ -1,29 +1,43 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaInstagram } from 'react-icons/fa'
-import { DEFAULT_GALLERY_CAKES } from '../data/galleryDefaults'
+import { FaInstagram, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+import { FIXED_SLOTS, mergeSlot } from '../data/galleryDefaults'
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 
 const CATEGORIES = ['All', 'Wedding', 'Birthday', 'Baby Shower', 'Anniversary', 'Cookies', 'Other']
 
-function photoFromRow(row) {
-  if (row.image_url) return row.image_url
-  if (Array.isArray(row.image_urls) && row.image_urls.length > 0) return row.image_urls[0]
-  return ''
-}
+const DESC_MAX = 120
 
-function mapGalleryRow(row) {
-  return {
-    id: row.id,
-    name: row.name,
-    category: row.category,
-    desc: row.description || '',
-    photo: photoFromRow(row),
-  }
+function truncateDesc(text) {
+  if (!text || text.length <= DESC_MAX) return text || ''
+  return `${text.slice(0, DESC_MAX).trimEnd()}…`
 }
 
 function CakeCard({ cake, index }) {
   const cardRef = useRef(null)
+  const [photoIndex, setPhotoIndex] = useState(0)
+  const slides = useMemo(() => (cake.photos || []).filter(Boolean).slice(0, 5), [cake.photos])
+  const slideSig = useMemo(() => slides.join('|'), [slides])
+
+  useEffect(() => {
+    setPhotoIndex(0)
+  }, [cake.slot_index, slideSig])
+
+  const safeIndex = Math.min(photoIndex, Math.max(0, slides.length - 1))
+  const currentSrc = slides.length > 0 ? slides[safeIndex] : cake.photos?.[0] || '/images/cake1.jpg'
+
+  const goPrev = (e) => {
+    e.stopPropagation()
+    e.preventDefault()
+    if (slides.length <= 1) return
+    setPhotoIndex((i) => (i - 1 + slides.length) % slides.length)
+  }
+  const goNext = (e) => {
+    e.stopPropagation()
+    e.preventDefault()
+    if (slides.length <= 1) return
+    setPhotoIndex((i) => (i + 1) % slides.length)
+  }
 
   const handleMouseMove = (e) => {
     const rect = cardRef.current?.getBoundingClientRect()
@@ -56,20 +70,67 @@ function CakeCard({ cake, index }) {
       >
         <div className="relative overflow-hidden" style={{ aspectRatio: '4/3', background: '#fff5f7' }}>
           <img
-            src={cake.photo}
+            src={currentSrc}
             alt={cake.name}
             className="pointer-events-none w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
-          <span className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-body tracking-widest uppercase pointer-events-none z-[1]"
-            style={{ background: 'rgba(201,168,76,0.9)', color: '#2a0a18' }}>
+          <span
+            className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-body tracking-widest uppercase pointer-events-none z-[1]"
+            style={{ background: 'rgba(201,168,76,0.9)', color: '#2a0a18' }}
+          >
             {cake.category}
           </span>
+
+          {slides.length > 1 ? (
+            <>
+              <button
+                type="button"
+                onClick={goPrev}
+                className="absolute left-2 top-1/2 z-[2] -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/50 min-h-[44px] min-w-[44px]"
+                aria-label="Previous photo"
+              >
+                <FaChevronLeft className="text-sm" />
+              </button>
+              <button
+                type="button"
+                onClick={goNext}
+                className="absolute right-2 top-1/2 z-[2] -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/50 min-h-[44px] min-w-[44px]"
+                aria-label="Next photo"
+              >
+                <FaChevronRight className="text-sm" />
+              </button>
+              <div className="absolute bottom-3 left-0 right-0 z-[2] flex justify-center gap-1.5 pointer-events-auto">
+                {slides.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setPhotoIndex(i)
+                    }}
+                    className="h-2 w-2 rounded-full transition-all min-h-[8px] min-w-[8px]"
+                    style={{
+                      background: i === safeIndex ? 'rgba(201,168,76,0.95)' : 'rgba(255,255,255,0.45)',
+                      transform: i === safeIndex ? 'scale(1.15)' : 'scale(1)',
+                    }}
+                    aria-label={`Photo ${i + 1} of ${slides.length}`}
+                    aria-current={i === safeIndex ? 'true' : undefined}
+                  />
+                ))}
+              </div>
+            </>
+          ) : null}
         </div>
 
         <div className="p-5">
           <h3 className="font-display text-xl italic font-bold text-cake-ink mb-2">{cake.name}</h3>
-          <p className="font-body text-sm text-cake-muted leading-relaxed mb-4 font-light">{cake.desc}</p>
+          {cake.size_inches ? (
+            <p className="font-body text-xs text-gold-700 tracking-wide mb-2">
+              Size: {cake.size_inches}&quot;
+            </p>
+          ) : null}
+          <p className="font-body text-sm text-cake-muted leading-relaxed mb-4 font-light">{truncateDesc(cake.desc)}</p>
           <div className="flex items-center justify-end">
             <a
               href={`https://wa.me/14034985666?text=Hi%20Sam!%20I'm%20interested%20in%20the%20${encodeURIComponent(cake.name)}%20cake.%20Can%20I%20get%20a%20quote%3F`}
@@ -89,16 +150,16 @@ function CakeCard({ cake, index }) {
 
 export default function Gallery() {
   const [active, setActive] = useState('All')
-  const [remoteCakes, setRemoteCakes] = useState([])
+  const [rows, setRows] = useState([])
 
   const loadRemote = useCallback(async () => {
     if (!isSupabaseConfigured() || !supabase) return
     const { data, error } = await supabase
       .from('gallery_cakes')
       .select('*')
-      .order('created_at', { ascending: false })
+      .order('slot_index', { ascending: true })
     if (!error && Array.isArray(data)) {
-      setRemoteCakes(data.map(mapGalleryRow).filter((c) => Boolean(c.photo)))
+      setRows(data)
     }
   }, [])
 
@@ -107,30 +168,34 @@ export default function Gallery() {
     if (!supabase) return undefined
     const channel = supabase
       .channel('gallery_cakes_changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'gallery_cakes' },
-        () => {
-          loadRemote()
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'gallery_cakes' }, () => {
+        loadRemote()
+      })
       .subscribe()
     return () => {
       supabase.removeChannel(channel)
     }
   }, [loadRemote])
 
-  const cakes = useMemo(
-    () => [...remoteCakes.filter((c) => c.photo), ...DEFAULT_GALLERY_CAKES],
-    [remoteCakes]
-  )
+  const merged = useMemo(() => {
+    const bySlot = new Map()
+    for (const row of rows) {
+      if (row.slot_index != null) bySlot.set(Number(row.slot_index), row)
+    }
+    return FIXED_SLOTS.map((slot) => mergeSlot(slot, bySlot.get(slot.slot_index)))
+  }, [rows])
 
-  const filtered = active === 'All' ? cakes : cakes.filter(c => c.category === active)
+  const filtered = useMemo(
+    () => (active === 'All' ? merged : merged.filter((c) => c.category === active)),
+    [merged, active]
+  )
 
   return (
     <section id="gallery" className="section-pad bg-cake-section relative" style={{ marginTop: 0 }}>
-      <div className="absolute top-0 left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, #f5c0d5, transparent)' }} />
+      <div
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{ background: 'linear-gradient(90deg, transparent, #f5c0d5, transparent)' }}
+      />
 
       <svg className="pointer-events-none absolute h-0 w-0 overflow-hidden" aria-hidden="true" focusable="false">
         <defs>
@@ -199,7 +264,7 @@ export default function Gallery() {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {filtered.map((cake, i) => (
-              <CakeCard key={cake.id} cake={cake} index={i} />
+              <CakeCard key={cake.slot_index} cake={cake} index={i} />
             ))}
           </motion.div>
         </AnimatePresence>
@@ -230,8 +295,10 @@ export default function Gallery() {
         </motion.div>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, #f5c0d5, transparent)' }} />
+      <div
+        className="absolute bottom-0 left-0 right-0 h-px"
+        style={{ background: 'linear-gradient(90deg, transparent, #f5c0d5, transparent)' }}
+      />
     </section>
   )
 }
